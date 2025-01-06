@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Appointment System</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+
+    <body>
+        <h1>Car Workshop Appointment</h1>
+        <form id="appointment-form">
+            <input type="text" name="name" placeholder="Name" required />
+            <input type="text" name="address" placeholder="Address" />
+            <input type="text" name="phone" placeholder="Phone" required />
+            <input type="text" name="car_license" placeholder="Car License" required />
+            <input type="text" name="car_engine" placeholder="Car Engine" required />
+            <input type="date" name="appointment_date" required />
+            <select name="mechanic_id" id="mechanics">
+                <!-- Dynamically populated -->
+            </select>
+            <button type="submit">Book Appointment</button>
+        </form>
+        <div id="message"></div>
+
+        <script>
+            async function loadMechanics() {
+                const response = await fetch('../server/user.php?action=getMechanics');
+                const mechanics = await response.json();
+                const select = document.getElementById('mechanics');
+                mechanics.forEach(mechanic => {
+                    const option = document.createElement('option');
+                    option.value = mechanic.id;
+                    option.textContent = `${mechanic.name} (Available: ${mechanic.daily_limit - mechanic.current_count})`;
+                    select.appendChild(option);
+                });
+            }
+
+            document.getElementById('appointment-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const response = await fetch('../server/user.php?action=bookAppointment', {
+                    method: 'POST',
+                    body: formData
+                });
+                const message = await response.text();
+                document.getElementById('message').textContent = message;
+                e.target.reset();
+                loadMechanics(); // Refresh mechanics list
+            });
+
+            loadMechanics();
+        </script>
+    </body>
+
+</html>
