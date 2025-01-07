@@ -1,12 +1,20 @@
 <?php
-require 'db.php';
+require '../server/db.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $appointmentId = $_POST['id'];
     $newDate = $_POST['appointment_date'];
     $newMechanicId = $_POST['mechanic_id'];
 
-    // Check if the selected mechanic is available for the given date
+    // Check if the appointment ID is valid
+    $stmt = $conn->prepare("SELECT * FROM appointments WHERE id = ?");
+    $stmt->execute([$appointmentId]);
+
+    if (!$stmt->fetch()) {
+        die("Invalid appointment ID.");
+    }
+
+    // Check new mechanic availability
     $stmt = $conn->prepare("
         SELECT COUNT(*) AS booked_slots
         FROM appointments
@@ -19,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         die("The selected mechanic is fully booked for this date.");
     }
 
-    // Update the appointment in the database
+    // Update the appointment
     $stmt = $conn->prepare("
         UPDATE appointments
         SET appointment_date = ?, mechanic_id = ?
@@ -27,8 +35,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     ");
     $stmt->execute([$newDate, $newMechanicId, $appointmentId]);
 
-    // Redirect back to the admin panel
-    header("Location: ../public/admin.html");
+    echo "Appointment updated successfully!";
+    header("Location: ../public/admin.php");
     exit;
 }
 ?>
