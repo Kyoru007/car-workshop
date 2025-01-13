@@ -1,0 +1,29 @@
+CREATE DATABASE workshop;
+USE workshop;
+CREATE TABLE mechanics (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    daily_limit INT DEFAULT 4
+);
+CREATE TABLE appointments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    client_id INT NOT NULL,
+    mechanic_id INT NOT NULL,
+    appointment_date DATE NOT NULL,
+    FOREIGN KEY (client_id) REFERENCES clients(id),
+    FOREIGN KEY (mechanic_id) REFERENCES mechanics(id)
+);
+ALTER TABLE clients ADD CONSTRAINT unique_car_engine UNIQUE (car_engine);
+INSERT INTO mechanics (name, daily_limit) VALUES
+('John Smith', 4),
+('Emily Davis', 4),
+('Michael Brown', 4),
+('Sarah Johnson', 4),
+('David Wilson', 4);
+INSERT INTO clients (name, address, phone, car_license, car_engine) VALUES
+('John Doe', '123 Main St', '1234567890', 'ABC-123', 'ENGINE001'),
+('Jane Smith', '456 Oak Rd', '0987654321', 'XYZ-789', 'ENGINE002');
+INSERT INTO appointments (client_id, mechanic_id, appointment_date) VALUES
+(1, 1, '2025-01-06'),
+(2, 2, '2025-01-07');
+
